@@ -1,7 +1,6 @@
 import { Box, Container, Flex, Heading, Text, VStack, Image, SimpleGrid, Link, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
-import { useState } from "react";
 import { FaShoppingCart, FaSearch } from "react-icons/fa";
-import { FaShoppingCart } from "react-icons/fa";
+import { useState } from "react";
 
 const sampleProducts = [
   {
