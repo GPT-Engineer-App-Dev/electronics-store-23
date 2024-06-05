@@ -1,4 +1,4 @@
-import { Box, Container, Flex, Heading, Text, VStack, Image, SimpleGrid, Link, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
+import { Box, Container, Flex, Heading, Text, VStack, Image, SimpleGrid, Link, Input, InputGroup, InputLeftElement, Select } from "@chakra-ui/react";
 import { FaShoppingCart, FaSearch } from "react-icons/fa";
 import { useState } from "react";
 
@@ -8,6 +8,8 @@ const sampleProducts = [
     name: "Smartphone",
     description: "Latest model with advanced features",
     price: "$699",
+    rating: 4,
+    category: "Smartphone",
     image: "https://via.placeholder.com/150"
   },
   {
@@ -15,6 +17,8 @@ const sampleProducts = [
     name: "Laptop",
     description: "High performance laptop for work and play",
     price: "$999",
+    rating: 5,
+    category: "Laptop",
     image: "https://via.placeholder.com/150"
   },
   {
@@ -22,20 +26,45 @@ const sampleProducts = [
     name: "Headphones",
     description: "Noise-cancelling over-ear headphones",
     price: "$199",
+    rating: 3,
+    category: "Headphones",
     image: "https://via.placeholder.com/150"
   }
 ];
 
+const categories = ["All", "Smartphone", "Laptop", "Headphones"];
+const ratings = [1, 2, 3, 4, 5];
+
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [rating, setRating] = useState(0);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredProducts = sampleProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleCategoryChange = (event) => {
+    setCategory(event.target.value);
+  };
+
+  const handlePriceRangeChange = (event) => {
+    const value = event.target.value.split(",");
+    setPriceRange([Number(value[0]), Number(value[1])]);
+  };
+
+  const handleRatingChange = (event) => {
+    setRating(Number(event.target.value));
+  };
+
+  const filteredProducts = sampleProducts.filter((product) => {
+    const matchesCategory = category === "All" || product.name.toLowerCase().includes(category.toLowerCase());
+    const matchesPrice = product.price.replace("$", "") >= priceRange[0] && product.price.replace("$", "") <= priceRange[1];
+    const matchesRating = product.rating >= rating;
+    return matchesCategory && matchesPrice && matchesRating;
+  });
+
   return (
     <Container maxW="container.xl" p={4}>
       <Flex as="nav" bg="blue.500" color="white" p={4} justifyContent="space-between" alignItems="center">
@@ -58,6 +87,35 @@ const Index = () => {
             onChange={handleSearchChange}
           />
         </InputGroup>
+        <Box mb={6}>
+          <Flex direction={{ base: "column", md: "row" }} justifyContent="space-between" alignItems="center">
+            <Box>
+              <Text>Category</Text>
+              <Select value={category} onChange={handleCategoryChange}>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </Select>
+            </Box>
+            <Box>
+              <Text>Price Range</Text>
+              <Input
+                type="text"
+                placeholder="e.g., 100,500"
+                value={priceRange.join(",")}
+                onChange={handlePriceRangeChange}
+              />
+            </Box>
+            <Box>
+              <Text>Rating</Text>
+              <Select value={rating} onChange={handleRatingChange}>
+                {ratings.map((rate) => (
+                  <option key={rate} value={rate}>{rate} Stars & Up</option>
+                ))}
+              </Select>
+            </Box>
+          </Flex>
+        </Box>
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
           {filteredProducts.map((product) => (
             <Box key={product.id} borderWidth="1px" borderRadius="lg" overflow="hidden">
